@@ -12,7 +12,7 @@ A backend application built using Spring Boot and PostgreSQL.
 
 ## 🗄️ Database Structure
 
-![Database Structure](images/database-structure.png)
+![Database Structure](images/DatabaseStructure.png)
 
 ## 🚀 Getting Started
 
