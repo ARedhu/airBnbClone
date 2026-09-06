@@ -4,6 +4,7 @@ package com.Ashish.airBnbClone.service;
 import com.Ashish.airBnbClone.dto.HotelDto;
 import com.Ashish.airBnbClone.entity.Hotel;
 import com.Ashish.airBnbClone.entity.Room;
+import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
 import com.Ashish.airBnbClone.repository.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class HotelServiceImpl implements HotelService{
         log.info("Getting the hotel with ID: {}", id);
         Hotel hotel = hotelRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: "+id));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
         return modelMapper.map(hotel, HotelDto.class);
     }
 
@@ -44,7 +45,7 @@ public class HotelServiceImpl implements HotelService{
         log.info("Updating the hotel with ID: {}", id);
         Hotel hotel = hotelRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: "+id));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
 //        hotel = modelMapper.map(hotelDto, Hotel.class); // This is wrong here. As we are creating a new object.
         modelMapper.map(hotelDto, hotel); // Here, we are simply mapping the newly coming hotelDto to the existing hotel.
         hotel.setId(id);
@@ -58,7 +59,7 @@ public class HotelServiceImpl implements HotelService{
     public void deleteHotelById(Long id) {
         Hotel hotel = hotelRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: "+id));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
 
         hotelRepository.deleteById(id);
         for(Room room: hotel.getRooms()) {
@@ -72,7 +73,7 @@ public class HotelServiceImpl implements HotelService{
         log.info("Activating the hotel with ID: {}", hotelId);
         Hotel hotel = hotelRepository
                 .findById(hotelId)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: "+hotelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
 
         hotel.setActive(true);
         // Create the inventory while activating it so that customers can book the room.

@@ -4,6 +4,7 @@ package com.Ashish.airBnbClone.service;
 import com.Ashish.airBnbClone.dto.RoomDto;
 import com.Ashish.airBnbClone.entity.Hotel;
 import com.Ashish.airBnbClone.entity.Room;
+import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
 import com.Ashish.airBnbClone.repository.HotelRepository;
 import com.Ashish.airBnbClone.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class RoomServiceImpl implements RoomService{
         log.info("Creating a new room in hotel with ID: {}", hotelId);
         Hotel hotel = hotelRepository
                 .findById(hotelId)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: "+hotelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
         Room room = modelMapper.map(roomDto, Room.class);
         room.setHotel(hotel);
         room = roomRepository.save(room);
@@ -43,7 +44,7 @@ public class RoomServiceImpl implements RoomService{
         log.info("Getting all rooms in hotel with ID: {}", hotelId);
         Hotel hotel = hotelRepository
                 .findById(hotelId)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: "+hotelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
 
         return hotel.getRooms()
                 .stream()
@@ -56,7 +57,7 @@ public class RoomServiceImpl implements RoomService{
         log.info("Getting the room with ID: {}", roomId);
         Room room = roomRepository
                 .findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found with ID: "+roomId));
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: "+roomId));
         return modelMapper.map(room, RoomDto.class);
     }
 
@@ -66,7 +67,7 @@ public class RoomServiceImpl implements RoomService{
         log.info("Deleting the room with ID: {}", roomId);
         Room room = roomRepository
                 .findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found with ID: "+roomId));
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: "+roomId));
         inventoryService.deleteFutureInventories(room);
         roomRepository.deleteById(roomId);
     }
