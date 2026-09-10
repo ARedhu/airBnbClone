@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/hotels/{hotelId}/rooms")
 @RequiredArgsConstructor
-public class RoomController {
+public class RoomAdminController {
 
     private final RoomService roomService;
 
@@ -35,7 +35,13 @@ public class RoomController {
 
     @DeleteMapping("/{roomId}")
     public ResponseEntity<RoomDto> deleteRoomById(@PathVariable Long hotelId, @PathVariable Long roomId) {
-        roomService.deleteRoomById(roomId);
+        roomService.deleteRoomById(hotelId, roomId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{roomId}")
+    public ResponseEntity<Void> activateRoom(@PathVariable Long hotelId, @PathVariable Long roomId){
+        roomService.activateRoomById(hotelId, roomId);
         return ResponseEntity.noContent().build();
     }
 

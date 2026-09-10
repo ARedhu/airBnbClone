@@ -63,14 +63,39 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     @Transactional
-    public void deleteRoomById(Long roomId) {
+    public void deleteRoomById(Long hotelId, Long roomId) {
         log.info("Deleting the room with ID: {}", roomId);
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
         Room room = roomRepository
                 .findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: "+roomId));
-        inventoryService.deleteFutureInventories(room);
+
+        if(!room.getHotel().getId().equals(hotelId)) {
+            throw new RuntimeException("Room does not belong to this hotel");
+        }
+        inventoryService.deleteAllInventories(room);
         roomRepository.deleteById(roomId);
     }
+
+    @Override
+    public void activateRoomById(Long hotelId, Long roomId){
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+        Room room = roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: "+roomId));
+
+        if(!room.getHotel().getId().equals(hotelId)) {
+            throw new RuntimeException("Room does not belong to this hotel");
+        }
+        inventoryService.initializeRoomForAYear(room);
+        room.setActive(true);
+    }
+
+
 
 }
 

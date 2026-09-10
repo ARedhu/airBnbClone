@@ -42,6 +42,9 @@ public class Room {
     @Column(nullable = false)
     private Integer capacity;  // What is the capacity of this type of room.
 
+    @Column(nullable = false)
+    private Boolean active = false;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
