@@ -3,8 +3,7 @@ package com.Ashish.airBnbClone.entity;
 
 import com.Ashish.airBnbClone.entity.enums.BookingStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +15,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Booking {
 
     @Id
@@ -49,10 +51,6 @@ public class Booking {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus bookingStatus;
@@ -66,6 +64,8 @@ public class Booking {
     ) // We can even skip this thing. But remember if we are using it, then use it only for one-side table/entity. Else it will try to create duplicate entries and will end up with an exception.
     private Set<Guest> guests;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
 }
 
 // Note:
