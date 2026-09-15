@@ -1,5 +1,6 @@
 package com.Ashish.airBnbClone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,7 +46,8 @@ public class Hotel {
     @ManyToOne
     private User owner;
 
-    @OneToMany(mappedBy = "hotel")
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Room> rooms;
 
 }
