@@ -52,7 +52,7 @@ public class Inventory {
     private BigDecimal surgeFactor;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price; // basePrice * surgeFactor
+    private BigDecimal price; // price after diff types of strategies implementations.
 
     @Column(nullable = false)
     private String city;

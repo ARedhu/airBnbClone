@@ -1,10 +1,12 @@
 package com.Ashish.airBnbClone.service;
 
 import com.Ashish.airBnbClone.dto.HotelDto;
+import com.Ashish.airBnbClone.dto.HotelPriceDto;
 import com.Ashish.airBnbClone.dto.HotelSearchReqDto;
 import com.Ashish.airBnbClone.entity.Hotel;
 import com.Ashish.airBnbClone.entity.Inventory;
 import com.Ashish.airBnbClone.entity.Room;
+import com.Ashish.airBnbClone.repository.HotelMinPriceRepository;
 import com.Ashish.airBnbClone.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ public class InventoryServiceImpl implements InventoryService{
 
     private final InventoryRepository inventoryRepository;
     private final ModelMapper modelMapper;
+    private final HotelMinPriceRepository hotelMinPriceRepository;
 
     @Override
     public void initializeRoomForAYear(Room room) {
@@ -54,13 +57,13 @@ public class InventoryServiceImpl implements InventoryService{
     }
 
     @Override
-    public Page<HotelDto> searchHotels(HotelSearchReqDto hotelSearchReqDto){
+    public Page<HotelPriceDto> searchHotels(HotelSearchReqDto hotelSearchReqDto){
         log.info("Searching hotels for {} city, from {} to {}", hotelSearchReqDto.getCity(), hotelSearchReqDto.getStartDate(), hotelSearchReqDto.getEndDate());
 
         Pageable pageable = PageRequest.of(hotelSearchReqDto.getPage(), hotelSearchReqDto.getSize());
         long daysCount = ChronoUnit.DAYS.between(hotelSearchReqDto.getStartDate(), hotelSearchReqDto.getEndDate()) + 1; // This line is very imp. See it may happen that in the inventory table, for a particular hotel, b/w these dates, for a particular day we have satisfied number of rooms but another date no room is available. So, we want only those hotels for which these daysCount, rooms are available b/w these dates.
 
-        Page<Hotel> hotelPage = inventoryRepository.findHotelsWithAvailableInventory(hotelSearchReqDto.getCity(), hotelSearchReqDto.getStartDate(), hotelSearchReqDto.getEndDate(), hotelSearchReqDto.getRoomsCount(), daysCount, pageable);
-        return hotelPage.map(element -> modelMapper.map(element, HotelDto.class));
+        Page<HotelPriceDto> hotelPage = hotelMinPriceRepository.findHotelWithAvailableInventory(hotelSearchReqDto.getCity(), hotelSearchReqDto.getStartDate(), hotelSearchReqDto.getEndDate(), hotelSearchReqDto.getRoomsCount(), daysCount, pageable);
+        return hotelPage;
     }
 }
