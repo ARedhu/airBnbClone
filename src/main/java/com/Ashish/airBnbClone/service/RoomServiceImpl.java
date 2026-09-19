@@ -4,12 +4,15 @@ package com.Ashish.airBnbClone.service;
 import com.Ashish.airBnbClone.dto.RoomDto;
 import com.Ashish.airBnbClone.entity.Hotel;
 import com.Ashish.airBnbClone.entity.Room;
+import com.Ashish.airBnbClone.entity.User;
 import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
+import com.Ashish.airBnbClone.exception.UnAuthorisedException;
 import com.Ashish.airBnbClone.repository.HotelRepository;
 import com.Ashish.airBnbClone.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,12 @@ public class RoomServiceImpl implements RoomService{
         Hotel hotel = hotelRepository
                 .findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())) {
+            throw new UnAuthorisedException("This user does not own this hotel with id: "+hotelId);
+        }
+
         Room room = modelMapper.map(roomDto, Room.class);
         room.setHotel(hotel);
         room = roomRepository.save(room);
@@ -75,6 +84,12 @@ public class RoomServiceImpl implements RoomService{
         if(!room.getHotel().getId().equals(hotelId)) {
             throw new RuntimeException("Room does not belong to this hotel");
         }
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(room.getHotel().getOwner())) {
+            throw new UnAuthorisedException("This user does not own this room with id: "+roomId);
+        }
+
         inventoryService.deleteAllInventories(room);
         roomRepository.deleteById(roomId);
     }
@@ -91,6 +106,12 @@ public class RoomServiceImpl implements RoomService{
         if(!room.getHotel().getId().equals(hotelId)) {
             throw new RuntimeException("Room does not belong to this hotel");
         }
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(room.getHotel().getOwner())) {
+            throw new UnAuthorisedException("This user does not own this room with id: "+roomId);
+        }
+
         inventoryService.initializeRoomForAYear(room);
         room.setActive(true);
     }

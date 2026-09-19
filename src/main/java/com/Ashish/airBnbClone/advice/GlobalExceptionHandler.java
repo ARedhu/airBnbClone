@@ -1,6 +1,7 @@
 package com.Ashish.airBnbClone.advice;
 
 import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
+import com.Ashish.airBnbClone.exception.UnAuthorisedException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,18 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError);
     }
 
+    @ExceptionHandler(UnAuthorisedException.class)
+    public ResponseEntity<ApiResponse<?>> handleUnauthorised(
+            UnAuthorisedException ex) {
+
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(ex.getMessage())
+                .build();
+
+        return buildErrorResponseEntity(apiError);
+    }
+
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ApiResponse<?>> handleJwtException(JwtException ex) {
         ApiError apiError = ApiError.builder()
@@ -44,7 +57,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleAccessDeniedException(AccessDeniedException ex) {
         ApiError apiError = ApiError.builder()
                 .status(HttpStatus.FORBIDDEN)
-                .message(ex.getMessage())
+                .message("Access denied : " + ex.getMessage())
                 .build();
         return buildErrorResponseEntity(apiError);
     }
