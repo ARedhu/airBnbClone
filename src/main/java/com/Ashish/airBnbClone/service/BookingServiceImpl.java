@@ -6,11 +6,13 @@ import com.Ashish.airBnbClone.dto.GuestDto;
 import com.Ashish.airBnbClone.entity.*;
 import com.Ashish.airBnbClone.entity.enums.BookingStatus;
 import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
+import com.Ashish.airBnbClone.exception.UnAuthorisedException;
 import com.Ashish.airBnbClone.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,11 @@ public class BookingServiceImpl implements BookingService{
     private final BookingRepository bookingRepository;
     private final GuestRepository guestRepository;
     private final ModelMapper modelMapper;
+    private final CheckoutService checkoutService;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
 
     @Override
     @Transactional
@@ -105,6 +112,31 @@ public class BookingServiceImpl implements BookingService{
         return modelMapper.map(booking, BookingDto.class);
     }
 
+    @Override
+    @Transactional
+    public String initiatePayments(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
+                () -> new ResourceNotFoundException("Booking not found with id: "+bookingId)
+        );
+        User user = getCurrentUser();
+        if(!user.equals(booking.getUser())){
+            throw new UnAuthorisedException("Booking does not belong to this user with id: "+user.getId());
+        }
+        if(hasBookingExpired(booking)){
+            throw new IllegalStateException("Booking has already expired");
+        }
+
+        String sessionUrl = checkoutService.getCheckoutSession(booking,
+                frontendUrl + "/payments/" + bookingId + "/status", // on successful payment, redirect the user to this url.
+                frontendUrl + "/payments/" + bookingId + "/status"   // on payment failure, redirect the user to this url.
+        );
+
+        booking.setBookingStatus(BookingStatus.PAYMENTS_PENDING);
+        bookingRepository.save(booking);
+
+        return sessionUrl;
+    }
+
 
     public User getCurrentUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -112,6 +144,6 @@ public class BookingServiceImpl implements BookingService{
 
     public boolean hasBookingExpired(Booking booking) {
         return booking.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now());
-    }
+    } // if Room A has only 1 available unit and someone starts booking it but never pays, expiration allows that room to become available for another customer after 10 minutes.
 
 }

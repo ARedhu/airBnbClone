@@ -90,6 +90,14 @@
 			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
+
+<!-- Stripe Dependency	-->
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>33.4.2</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

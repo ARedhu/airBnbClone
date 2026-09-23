@@ -2,6 +2,7 @@ package com.Ashish.airBnbClone.controller;
 
 import com.Ashish.airBnbClone.dto.BookingDto;
 import com.Ashish.airBnbClone.dto.BookingInitRequest;
+import com.Ashish.airBnbClone.dto.BookingPaymentInitResponseDto;
 import com.Ashish.airBnbClone.dto.GuestDto;
 import com.Ashish.airBnbClone.service.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,12 @@ public class HotelBookingController {
     public ResponseEntity<BookingDto> addGuests(@PathVariable Long bookingId,
                                                 @RequestBody List<GuestDto> guestDtoList) {
         return ResponseEntity.ok(bookingService.addGuests(bookingId, guestDtoList));
+    }
+
+    @PostMapping("/{bookingId}/payments")
+    public ResponseEntity<BookingPaymentInitResponseDto> initiatePayment(@PathVariable Long bookingId){
+        String sessionUrl = bookingService.initiatePayments(bookingId); // The sessionUrl represents a temporary Stripe Checkout page/session for that specific payment. Stripe server sends this url to -> our backend server sends this url to -> our frontend visits this url for payment
+        return ResponseEntity.ok(new BookingPaymentInitResponseDto(sessionUrl));
     }
 
 }
