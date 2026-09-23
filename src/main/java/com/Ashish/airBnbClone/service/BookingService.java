@@ -3,6 +3,7 @@ package com.Ashish.airBnbClone.service;
 import com.Ashish.airBnbClone.dto.BookingDto;
 import com.Ashish.airBnbClone.dto.BookingInitRequest;
 import com.Ashish.airBnbClone.dto.GuestDto;
+import com.stripe.model.Event;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface BookingService {
     BookingDto addGuests(Long bookingId, List<GuestDto> guestDtoList);
 
     String initiatePayments(Long bookingId);
+
+    void capturePayment(Event event);
 }

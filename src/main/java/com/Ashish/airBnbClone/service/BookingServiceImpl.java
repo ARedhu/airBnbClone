@@ -8,6 +8,8 @@ import com.Ashish.airBnbClone.entity.enums.BookingStatus;
 import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
 import com.Ashish.airBnbClone.exception.UnAuthorisedException;
 import com.Ashish.airBnbClone.repository.*;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +78,7 @@ public class BookingServiceImpl implements BookingService{
                 .checkOutDate(bookingInitRequest.getCheckOutDate())
                 .user(getCurrentUser())
                 .roomsCount(bookingInitRequest.getRoomsCount())
-                .amount(BigDecimal.TEN)
+                .amount(new BigDecimal("1000"))  // TODO: Dynamic price.
                 .build();
 
         booking = bookingRepository.save(booking);
@@ -137,8 +139,50 @@ public class BookingServiceImpl implements BookingService{
         return sessionUrl;
     }
 
+    @Override
+    public void capturePayment(Event event) {
+
+        /*
+         Stripe can send MANY different types of webhook events.
+         e.g.
+         * checkout.session.completed
+         * payment_intent.succeeded
+         * payment_intent.payment_failed
+         * customer.created
+         * etc.
+         * We are interested in checkout.session.completed.
+         */
+
+        if("checkout.session.completed".equals(event.getType())){
+            Session session = (Session) event
+                    .getDataObjectDeserializer() //  Gives us access to the actual Stripe object associated with this event.
+                    .getObject()
+                    .orElse(null);
+
+            if(session == null) return;
+
+            String sessionId = session.getId();
+            Booking booking = bookingRepository.findByPaymentSessionId(sessionId).orElseThrow(
+                    () -> new ResourceNotFoundException("Booking not found for session ID: "+sessionId)
+            );
+            booking.setBookingStatus(BookingStatus.CONFIRMED);
+            bookingRepository.save(booking);
+
+            // We can lock and get in a single command. But in case of some updates we have to first lock it seperately.
+            inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate(), booking.getRoomsCount());
+
+            inventoryRepository.confirmBooking(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate(), booking.getRoomsCount());
+            log.info("Successfully confirmed the booking for Booking ID: {}", booking.getId());
+        }
+        else{
+            log.warn("Unhandled event type: {}", event.getType());
+        }
+
+    }
+
 
     public User getCurrentUser(){
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
