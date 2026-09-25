@@ -6,6 +6,7 @@ import com.Ashish.airBnbClone.dto.BookingPaymentInitResponseDto;
 import com.Ashish.airBnbClone.dto.GuestDto;
 import com.Ashish.airBnbClone.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,12 @@ public class HotelBookingController {
     public ResponseEntity<BookingPaymentInitResponseDto> initiatePayment(@PathVariable Long bookingId){
         String sessionUrl = bookingService.initiatePayments(bookingId); // The sessionUrl represents a temporary Stripe Checkout page/session for that specific payment. Stripe server sends this url to -> our backend server sends this url to -> our frontend visits this url for payment
         return ResponseEntity.ok(new BookingPaymentInitResponseDto(sessionUrl));
+    }
+
+    @PostMapping("/{bookingId}/cancel")
+    public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId){
+        bookingService.cancelBooking(bookingId);
+        return ResponseEntity.noContent().build();
     }
 
 }
