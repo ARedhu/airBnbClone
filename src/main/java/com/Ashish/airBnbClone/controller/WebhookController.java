@@ -21,7 +21,7 @@ public class WebhookController {
     private String endpointSecret;
 
     @PostMapping("/payment")
-    public ResponseEntity<String> capturePayments(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader){
+    public ResponseEntity<Void> capturePayments(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader){
         // Stripe sends a JSON payload, but we need the ORIGINAL/raw payload for signature verification. Therefore, don't convert this directly into a DTO.
         // Stripe sends this HTTP header along with the webhook. This signature is used together with endpointSecret to verify the authenticity of the webhook.
 
@@ -33,11 +33,12 @@ public class WebhookController {
                     endpointSecret
             );
             // At this point the webhook has been verified.
-
+            System.out.println("========== WEBHOOK VERIFIED ==========");
             bookingService.capturePayment(event);
-            return ResponseEntity.ok("Webhook received");
+            System.out.println("========== CAPTURE PAYMENT RETURNED ==========");
+            return ResponseEntity.noContent().build();
 
-        }catch (SignatureVerificationException e){
+        }catch (SignatureVerificationException e) {
             throw new RuntimeException(e);
         }
     }

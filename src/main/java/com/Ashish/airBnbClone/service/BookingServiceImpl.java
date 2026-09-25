@@ -8,6 +8,7 @@ import com.Ashish.airBnbClone.entity.enums.BookingStatus;
 import com.Ashish.airBnbClone.exception.ResourceNotFoundException;
 import com.Ashish.airBnbClone.exception.UnAuthorisedException;
 import com.Ashish.airBnbClone.repository.*;
+import com.Ashish.airBnbClone.strategy.PricingService;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,7 @@ public class BookingServiceImpl implements BookingService{
     private final GuestRepository guestRepository;
     private final ModelMapper modelMapper;
     private final CheckoutService checkoutService;
+    private final PricingService pricingService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -70,6 +72,10 @@ public class BookingServiceImpl implements BookingService{
         }
         inventoryRepository.saveAll(inventoryList);
 
+
+        BigDecimal priceForOneRoom = pricingService.calculateTotalPrice(inventoryList);
+        BigDecimal totalPrice = priceForOneRoom.multiply(BigDecimal.valueOf(bookingInitRequest.getRoomsCount()));
+
         Booking booking = Booking.builder()
                 .bookingStatus(BookingStatus.RESERVED)
                 .hotel(hotel)
@@ -78,7 +84,7 @@ public class BookingServiceImpl implements BookingService{
                 .checkOutDate(bookingInitRequest.getCheckOutDate())
                 .user(getCurrentUser())
                 .roomsCount(bookingInitRequest.getRoomsCount())
-                .amount(new BigDecimal("1000"))  // TODO: Dynamic price.
+                .amount(totalPrice)
                 .build();
 
         booking = bookingRepository.save(booking);
@@ -140,6 +146,7 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
+    @Transactional
     public void capturePayment(Event event) {
 
         /*
