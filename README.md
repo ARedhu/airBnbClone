@@ -4,7 +4,7 @@ A backend implementation of an Airbnb-like hotel booking and management platform
 
 The application supports hotel and room management, date-wise inventory management, dynamic pricing, booking, secure payments using **Stripe Checkout**, Stripe webhooks, payment confirmation, cancellation, and refunds.
 
-
+---
 ## 🛠️ Tech Stack
 
 ### Backend
@@ -30,6 +30,7 @@ The application supports hotel and room management, date-wise inventory manageme
 - DBeaver
 - Git / GitHub
 
+---
 # 📌 Features
 
 - User registration and login
@@ -222,7 +223,7 @@ Add this secret to your local environment:
 STRIPE_WEBHOOK_SECRET=whsec_********
 ```
 
-
+---
 ## 📅 Production Considerations
 
 The following improvements can be added for a production deployment:
