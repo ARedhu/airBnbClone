@@ -87,6 +87,9 @@ Hotel
       ├── Inventory (Sep 12)
       └── Inventory (Sep 13)
 ```
+
+--- 
+
 ## 💳 Stripe Payment Integration
 
 This project integrates **Stripe Checkout** for handling payments, payment
@@ -158,7 +161,7 @@ sequenceDiagram
 | Production | `Stripe → Public HTTPS Backend` |
 
 
-
+---
 ## 🚀 Getting Started
 
 ### Prerequisites
