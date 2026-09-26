@@ -7,58 +7,74 @@ The application supports hotel and room management, date-wise inventory manageme
 ---
 ## 🛠️ Tech Stack
 
-### Backend
-- Java
-- Spring Boot
-- Spring Data JPA / Hibernate
-- Spring Security
-- JWT
-- OAuth2
+**Backend:**  
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=flat&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat&logo=springsecurity&logoColor=white)
+![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=flat&logo=hibernate&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
+![OAuth2](https://img.shields.io/badge/OAuth2-EB5424?style=flat&logo=auth0&logoColor=white)
 
-### Database
-- PostgreSQL
+**Database:**  
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
 
-### Payments
-- Stripe Checkout
-- Stripe Webhooks
-- Stripe CLI
+**Payments:**  
+![Stripe](https://img.shields.io/badge/Stripe-635BFF?style=flat&logo=stripe&logoColor=white)
+![Stripe Webhooks](https://img.shields.io/badge/Stripe%20Webhooks-635BFF?style=flat&logo=stripe&logoColor=white)
+![Stripe CLI](https://img.shields.io/badge/Stripe%20CLI-635BFF?style=flat&logo=stripe&logoColor=white)
 
-### Tools
-- Maven
-- IntelliJ IDEA
-- Postman
-- DBeaver
-- Git / GitHub
+**Tools:**  
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=flat&logo=apachemaven&logoColor=white)
+![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=flat&logo=intellijidea&logoColor=white)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white)
+![DBeaver](https://img.shields.io/badge/DBeaver-382923?style=flat&logo=dbeaver&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
+
 
 ---
-# 📌 Features
+## 📌 Features
 
+### 🔐 Authentication & Security
 - User registration and login
 - JWT-based authentication
-- Refresh token using HttpOnly cookies
+- Refresh tokens using HttpOnly cookies
 - Google OAuth2 authentication
+- Role-based access control
+- CSRF, XSS, and SQL injection protection
+
+### 🏨 Hotel & Room Management
 - Hotel management
 - Room management
 - Date-wise room inventory
 - Dynamic room pricing
-- Hotel search
-- Pagination
-- Booking management
-- Pessimistic locking for inventory
+- Hotel search with pagination
+
+### 📅 Booking & Inventory
+- Booking creation and management
+- Inventory reservation and availability tracking
+- Pessimistic locking for concurrent inventory updates
+
+### 💳 Payments
 - Stripe Checkout integration
-- Stripe webhook payment confirmation
+- Stripe webhook-based payment confirmation
 - Booking cancellation
-- Stripe refunds
-- Role-based security
-- CSRF / XSS / SQL Injection protection
+- Stripe refund processing
+
 
 ---
+## 🔄 Project Flow
+The diagram below provides a high-level overview of the application's major components and the flow between authentication, hotel management, search, booking, Stripe payments, webhook-based confirmation, and cancellation/refunds.
 
+![Project Flow](images/ProjectFlow.png)
+
+
+---
 ## 🗄️ Database Structure
 
 ![Database Structure](images/DatabaseStructure.png)
 
-
+---
 ## 💡 Doubt
 ### Room vs Inventory 
 
@@ -161,6 +177,37 @@ sequenceDiagram
 | Local Development | `Stripe → Stripe CLI → Local Spring Boot` |
 | Production | `Stripe → Public HTTPS Backend` |
 
+---
+## 🧪 API Testing
+The deployed API can be tested using Postman.
+
+### Prerequisites
+
+- Install [Postman](https://www.postman.com/downloads/)
+- No local database setup is required.
+- The backend is deployed on Railway.
+
+### Import Postman Collection
+
+1. Download the Postman collection:
+   `postman/AirBnbClone.postman_collection.json`
+
+2. Open Postman.
+
+3. Click **Import**.
+
+4. Select the downloaded JSON file.
+
+5. The `AirBnbClone` collection will be imported.
+
+### Base URL
+
+The collection uses the following deployed backend:
+
+```text
+https://airbnbclone-production-d729.up.railway.app/api/v1
+```
+
 
 ---
 ## 🚀 Getting Started
@@ -222,6 +269,8 @@ Add this secret to your local environment:
 ```env
 STRIPE_WEBHOOK_SECRET=whsec_********
 ```
+
+
 
 ---
 ## 📅 Production Considerations
